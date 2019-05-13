@@ -3,12 +3,14 @@ package persistence;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 
+import model.Alumno;
 import model.SheetA;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -52,11 +54,12 @@ public class ReadExcel {
 		return sheets;
 	}
 	
-	public List<String[]> getSheet1(){
+	/*
+	public List<String[]> getSheetByIndex(int index){
 	  loadFile();
 	  List<String[]> data = new ArrayList<>();
 	  
-	  Sheet sheet = workbook.getSheetAt(0);
+	  Sheet sheet = workbook.getSheetAt(index);
 	  int numOfRows = sheet.getPhysicalNumberOfRows();
 	  int numOfCols = sheet.getRow(0).getPhysicalNumberOfCells();
 	  
@@ -73,6 +76,95 @@ public class ReadExcel {
 	      data.add(cellData); 
 	 }
 	 return data;
+	}
+	*/
+	
+	
+	public List<String[]> getSheetByIndex(int index){
+	  loadFile();
+	  List<String[]> data = new ArrayList<>();
+	  
+	  Sheet sheet = workbook.getSheetAt(index);
+	  int numOfRows = sheet.getPhysicalNumberOfRows();
+	  int numOfCols = sheet.getRow(0).getPhysicalNumberOfCells();
+	  
+	  for(int i = 2; i < numOfRows; i++) {
+		  //System.out.println("numofRow " + i);
+		  Row row = sheet.getRow(i);
+		  String[] cellData = new String[numOfCols];
+	      for(int j = 0; j < numOfCols; j++) {
+	    	   Cell cell = row.getCell(j);
+	    	   if(cell.getCellType() == Cell.CELL_TYPE_STRING) {
+	    			cellData[j] = cell.getStringCellValue();
+	    	   }else {
+	    			cellData[j] = String.valueOf(cell.getNumericCellValue());
+	           }
+	          
+	      }
+	      data.add(cellData); 
+	 }
+	 return data;
+	}
+	
+	
+	public HashMap<String, String> getSheetCol(int index){
+		loadFile();
+		HashMap<String, String> sheetCols = new HashMap<String, String>();
+		String colName;
+		String colWeight;
+		 Sheet sheet = workbook.getSheetAt(index);
+		 int numOfRows = sheet.getPhysicalNumberOfRows();
+		 int numOfCols = sheet.getRow(0).getPhysicalNumberOfCells();
+		 
+		 Row row0 = sheet.getRow(0);
+		 Row row1 = sheet.getRow(1);
+		      for(int j = 2; j < numOfCols; j++) {
+		    	   Cell cell1 = row0.getCell(j);
+		    	   Cell cell2 = row1.getCell(j);
+		    	   if(cell1.getCellType() == Cell.CELL_TYPE_STRING) {
+		    		  colName = cell1.getStringCellValue();
+		    	   }else {
+		    		   colName = String.valueOf(cell1.getNumericCellValue());
+		    	   }
+		    	   if(cell2.getCellType() == Cell.CELL_TYPE_NUMERIC) {  
+			    		  colWeight = String.valueOf(cell2.getNumericCellValue());
+			    	   }else {
+			    		  colWeight = cell2.getStringCellValue();
+			    	   } 
+		    	   /*
+		    	   if(cell2.getCellType() == Cell.CELL_TYPE_STRING) {  
+		    		  colWeight = cell2.getStringCellValue();
+		    	   }else {
+		    		  colWeight = String.valueOf(cell2.getNumericCellValue());
+		    	   } */
+		    	sheetCols.put(colName, colWeight);   
+		      }
+		 return sheetCols;
+		}
+		
+	
+	
+	
+	/**
+	 * Gets alumnos names from excel sheet 1
+	 * 
+	 * @return
+	 */
+	public List<Alumno> getAlumnos(){
+		loadFile();
+		List<Alumno> alumnos = new ArrayList<>();
+		Sheet sheet = workbook.getSheetAt(0);
+		int numOfRows = sheet.getPhysicalNumberOfRows();
+		for(int i = 2; i < numOfRows-1; i++) {
+			  //System.out.println("numofRow " + i);
+			  Row row = sheet.getRow(i);
+			  String apellido = row.getCell(0).getStringCellValue();
+			  String nombre = row.getCell(1).getStringCellValue();
+		      alumnos.add(new Alumno(nombre, apellido)); 
+		 }
+		 return alumnos;
+	}
+		
 	}
 	
 	/*
@@ -190,4 +282,4 @@ public class ReadExcel {
 	 * // Closing the workbook workbook.close(); }
 	 */
 
-}
+

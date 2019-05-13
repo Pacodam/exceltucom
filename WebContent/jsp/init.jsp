@@ -14,9 +14,7 @@
 </head>
 <body>
 
-<%
-	Manager manager = new Manager();
-%>
+
 
 <!--  obtener nombre del excel -->
 
@@ -28,34 +26,44 @@
 <nav class="navbar navbar-expand-sm bg-light">
   <ul class="navbar-nav">
   
+  
   <%
-    	List<SheetA> sheets = manager.getSheets();
-        for(SheetA s: sheets){
-    %>
+      if (request.getAttribute("sheets") != null) {
+           List<SheetA> sheets = (List<SheetA>) request.getAttribute("sheets"); 
+           if(!sheets.isEmpty()){
+               for(SheetA s: sheets){
+         
+   %>
           <li class="nav-item">
-            <a class="nav-link" href=<% out.println(s.getHref()); %>><% out.println(s.getName());%></a>
+            <a class="nav-link" href="<%= s.getHref() %>"><%= s.getName() %></a> 
           </li>
-          <% } %>
+    <% } 
+        }
+          } %>
    </ul>
    </nav>
     
+    <% if(request.getAttribute("sheet") != null){
+    	String sheet = (String) request.getAttribute("sheet");%>
     <!--  titulo del sheet -->
-    <h1><% out.println(manager.getSheetName(0)); %></h1>
+    <h1><%= sheet %></h1>
     <p>Excel evaluativo</p>
+    <% } %>
 
 	<!-- tabla con los datos del primer sheet -->
 	
-	<% List<String[]> data = manager.getSheet1(); %>
+	<%  if(request.getAttribute("data") != null){
+	     List<String[]> data = (List<String[]>) request.getAttribute("data"); %>
 	
-	<table class="table table-striped">
-	  <thead>
-	    <tr>
+	<table class="table table-striped table-bordered ">
+	   <thead>
+	     <tr>
 	      <% String[] firstRow = data.get(0);
 	         for(int i = 0; i < firstRow.length; i++){
-	      %>
+	       %>
 	      <th scope="col"><% out.println(firstRow[i]); %></th>
 	      <% } %>
-	    </tr>
+	     </tr>
 	  </thead>
 	  <tbody>
 	    <% for(int i = 1; i < data.size(); i++){ %>
@@ -65,10 +73,15 @@
 	   
 	      <% for(int j = 0; j < row.length; j++){ %>
 	      <td><% out.println(row[j]); }%></td>
+	   
 	    </tr>
-	    <% } %>
+	     <% } %>
+	    
+	  
+	    
 	  </tbody>
-	</table>
+   </table>
+   <% } %>
 </body>
 </html>
 
